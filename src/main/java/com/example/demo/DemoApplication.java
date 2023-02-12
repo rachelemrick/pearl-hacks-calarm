@@ -17,7 +17,7 @@ public class DemoApplication {
 	public static final String ALARMS_HEADER = "<b>Here are your alarms for %s:</b>";
 	public static final String ALARMS_FOOTER = "<a href = \"http://localhost:8080/home\">Home</a>";
 	public static final String ADD_ALARM = "<form method = \"post\"><input type = \"time\" name=\"time\"/><input type = \"text\" name = \"name\"/><input type = \"hidden\" value = \"%s\" name = \"day\"/></form>";
-	public static final String REMOVE_ALARM = "<form method = \"delete\"><input type = \"button\" name = \"button\"><input type = \"hidden\" value = \"%s\" name=\"time\"/><input type = \"hidden\" value = \"%s\" name = \"name\"/><input type = \"hidden\" value = \"%s\" name = \"day\"/></form> Remove Alarm";
+	public static final String REMOVE_ALARM = "Remove Alarm: <form method = \"delete\"><input type = \"button\" name = \"button\"><input type = \"hidden\" value = \"%s\" name=\"time\"/><input type = \"hidden\" value = \"%s\" name = \"name\"/><input type = \"hidden\" value = \"%s\" name = \"day\"/></form>";
 	@Autowired
 	private AlarmControllerImpl alarmController;
 	@Autowired
@@ -75,6 +75,7 @@ public class DemoApplication {
 	) {
 		// This means the form has been filled out
 		AlarmImpl alarm = asi.makeAlarmImpl();
+		// System.out.println("Add: " + asi.getDay() + ":" + asi.getTime() + ":" + asi.getName());
 		DAYS_OF_WEEK dayEnum = DAYS_OF_WEEK.valueOf(asi.getDay().split(",")[0]);
 		alarmController.createAlarm(alarm.getTime(), dayEnum, alarm.getName());
 		String retVal = String.format("<a href = \"http://localhost:8080/alarms?day=%s\">Return</a> \n", dayEnum);
@@ -88,7 +89,6 @@ public class DemoApplication {
 	) {
 		// Remove alarm
 		// We seem to be getting the right values for getDay, getTime, and getName
-		System.out.println("Are we getting here? TEST");
 		System.out.println("Remove: " + asi.getDay() + ":" + asi.getTime() + ":" + asi.getName());
 
 		DAYS_OF_WEEK dayEnum = DAYS_OF_WEEK.valueOf(asi.getDay());
