@@ -28,7 +28,10 @@ public class AlarmStringImpl {
 
     public AlarmImpl makeAlarmImpl() {
         TimeImpl t = TimeImpl.parse(time);
+        System.out.println("Time = " + time);
         AlarmImpl alarm = new AlarmImpl(t, name);
+        System.out.println("name = " + name);
+        System.out.println("day = " + day);
         return alarm;
     }
 

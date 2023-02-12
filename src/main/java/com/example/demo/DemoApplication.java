@@ -15,8 +15,9 @@ import java.util.stream.Collectors;
 public class DemoApplication {
 
 	public static final String ALARMS_HEADER = "<b>Here are your alarms for %s:</b>";
-	public static final String ALARMS_FOOTER = ""; // TODO: make a link to homepage, style as button
+	public static final String ALARMS_FOOTER = "<a href = \"http://localhost:8080/home\">Home</a>";
 	public static final String ADD_ALARM = "<form method = \"post\"><input type = \"time\" name=\"time\"/><input type = \"text\" name = \"name\"/><input type = \"hidden\" value = \"%s\" name = \"day\"/></form>";
+	public static final String REMOVE_ALARM = "<form method = \"delete\"><input type = \"button\" name = \"button\"><input type = \"hidden\" value = \"%s\" name=\"time\"/><input type = \"hidden\" value = \"%s\" name = \"name\"/><input type = \"hidden\" value = \"%s\" name = \"day\"/></form> Remove Alarm";
 	@Autowired
 	private AlarmControllerImpl alarmController;
 	@Autowired
@@ -26,9 +27,17 @@ public class DemoApplication {
 
 		SpringApplication.run(DemoApplication.class, args);
 	}
-	@GetMapping("/hello")
+	@GetMapping("/home")
 	public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
-		return String.format("Hello %s!", name);
+		String text = "<a href = \"http://localhost:8080/alarms?day=MONDAY\">Monday</a> \n";
+		text += "<a href = \"http://localhost:8080/alarms?day=TUESDAY\">Tuesday</a> \n";
+		text += "<a href = \"http://localhost:8080/alarms?day=WEDNESDAY\">Wednesday</a> \n";
+		text += "<a href = \"http://localhost:8080/alarms?day=THURSDAY\">Thursday</a> \n";
+		text += "<a href = \"http://localhost:8080/alarms?day=FRIDAY\">Friday</a> \n";
+		text += "<a href = \"http://localhost:8080/alarms?day=SATURDAY\">Saturday</a> \n";
+		text += "<a href = \"http://localhost:8080/alarms?day=SUNDAY\">Sunday</a> \n";
+		return text;
+
 	}
 
 	@GetMapping("/alarms")
@@ -48,6 +57,7 @@ public class DemoApplication {
 
 		for (Alarm alarm : list) {
 			alarms += alarm.getName() + " at " + alarm.getTime().getHour() + ":" + alarm.getTime().getMinute();
+			alarms += String.format(REMOVE_ALARM, alarm.getTime().getHour() + ":" + alarm.getTime().getMinute(), alarm.getName(), day);
 			alarms += "\n";
 		}
 
@@ -64,11 +74,30 @@ public class DemoApplication {
 			@ModelAttribute AlarmStringImpl asi
 	) {
 		// This means the form has been filled out
-		System.out.println(asi.getTime() + asi.getName()+ asi.getDay().split(",")[0]);
 		AlarmImpl alarm = asi.makeAlarmImpl();
 		DAYS_OF_WEEK dayEnum = DAYS_OF_WEEK.valueOf(asi.getDay().split(",")[0]);
 		alarmController.createAlarm(alarm.getTime(), dayEnum, alarm.getName());
-		return "Success";
+		String retVal = String.format("<a href = \"http://localhost:8080/alarms?day=%s\">Return</a> \n", dayEnum);
+		return retVal;
+
+	}
+
+	@DeleteMapping("/alarms")
+	public String removeAlarm(
+			@ModelAttribute AlarmStringImpl asi
+	) {
+		// Remove alarm
+		// We seem to be getting the right values for getDay, getTime, and getName
+		System.out.println("Are we getting here? TEST");
+		System.out.println("Remove: " + asi.getDay() + ":" + asi.getTime() + ":" + asi.getName());
+
+		DAYS_OF_WEEK dayEnum = DAYS_OF_WEEK.valueOf(asi.getDay());
+		System.out.println(dayEnum.toString());
+		alarmController.removeAlarm(asi.makeAlarmImpl().getTime(), dayEnum);
+
+
+		String retVal = String.format("<a href = \"http://localhost:8080/alarms?day=%s\">Return</a> \n", dayEnum);
+		return retVal;
 	}
 
 
@@ -98,7 +127,6 @@ public class DemoApplication {
 	}
 
 	// Next steps:
-	// Footer home button (link) tomorrow
 	// 11:00 formatting to 11:0
 
 
